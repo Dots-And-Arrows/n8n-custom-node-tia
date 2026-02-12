@@ -6,16 +6,16 @@ import type {
 } from 'n8n-workflow';
 import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
 
-export class Example implements INodeType {
+export class Tia implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'Example',
-		name: 'example',
-		icon: { light: 'file:example.svg', dark: 'file:example.dark.svg' },
+		displayName: 'Tia',
+		name: 'tia',
+		icon: { light: 'file:Tia.svg', dark: 'file:Tia.dark.svg' },
 		group: ['input'],
 		version: 1,
-		description: 'Basic Example Node',
+		description: 'Basic Tia Node',
 		defaults: {
-			name: 'Example',
+			name: 'Tia',
 		},
 		inputs: [NodeConnectionTypes.Main],
 		outputs: [NodeConnectionTypes.Main],
