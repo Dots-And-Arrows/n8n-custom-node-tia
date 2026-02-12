@@ -30,7 +30,7 @@
     "n8n": {
         "n8nNodesApiVersion": 1,
         "strict": true,
-        "credentials": [],
+        "credentials": ["dist/credentials/TiaApi.credentials.js"],
         "nodes": [
             "dist/nodes/Tia/Tia.node.js"
         ]
