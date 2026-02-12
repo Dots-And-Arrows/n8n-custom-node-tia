@@ -1,7 +1,7 @@
 {
     "name": "n8n-nodes-tia",
     "version": "0.1.0",
-    "description": "",
+    "description": "Custom n8n node for TIA API integration",
     "license": "MIT",
     "homepage": "",
     "keywords": [
@@ -13,7 +13,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/<...>/n8n-nodes-<...>.git"
+        "url": "git@github.com:Dots-And-Arrows/n8n-custom-node-tia.git"
     },
    "scripts": {
 		"build": "n8n-node build",
@@ -32,7 +32,7 @@
         "strict": true,
         "credentials": [],
         "nodes": [
-            "dist/nodes/Example/Example.node.js"
+            "dist/nodes/Tia/Tia.node.js"
         ]
     },
     "devDependencies": {
