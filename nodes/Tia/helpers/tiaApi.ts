@@ -160,8 +160,24 @@ export async function tiaApiRequest(
 			}
 		}
 
+		// Extract error details for better debugging
+		const errorMessage = error.message || 'Unknown error';
+		const statusCode = error.statusCode || error.status || 'No status code';
+		let responseBody = 'No response data';
+
+		if (error.response?.body) {
+			try {
+				responseBody = typeof error.response.body === 'string'
+					? error.response.body
+					: JSON.stringify(error.response.body);
+			} catch {
+				responseBody = 'Unable to parse response';
+			}
+		}
+
 		throw new NodeApiError(this.getNode(), error, {
 			message: `TIA API request failed: ${method} ${endpoint}`,
+			description: `Status: ${statusCode}\nError: ${errorMessage}\nResponse: ${responseBody}`,
 		});
 	}
 }

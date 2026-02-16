@@ -115,9 +115,13 @@ export class Tia implements INodeType {
 							i,
 						) as IDataObject;
 
-						// Format dates to YYYY-MM-DD if they include time
-						const formattedStartDate = startDate.split('T')[0];
-						const formattedEndDate = endDate.split('T')[0];
+						// Format dates to yyyy-MM-dd HH:mm:ss:ffZ (API requires this format or 'yyyyMMdd')
+						// Extract date part and add time: 2025-01-01T00:00:00 -> 2025-01-01 00:00:00:00Z
+						const formattedStartDate = startDate.split('T')[0] + ' 00:00:00:00Z';
+						const formattedEndDate = endDate.split('T')[0] + ' 23:59:59:99Z';
+
+
+
 
 						const endpoint = `/v1/Timesheet/period/${formattedStartDate}/${formattedEndDate}`;
 
