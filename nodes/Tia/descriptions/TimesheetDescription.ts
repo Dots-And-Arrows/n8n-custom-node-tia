@@ -1,5 +1,22 @@
+/**
+ * Timesheet Resource Descriptions
+ *
+ * Defines the operations and fields for the Timesheet resource.
+ * This modular approach keeps field definitions separate from the main node file.
+ *
+ * Structure:
+ * - timesheetOperations: Dropdown menu for operation selection
+ * - timesheetFields: Input fields that appear based on selected operation
+ *
+ * Note: displayOptions.show controls when fields appear based on resource/operation
+ */
+
 import type { INodeProperties } from 'n8n-workflow';
 
+/**
+ * Timesheet Operations
+ * Defines the dropdown menu for selecting which operation to perform
+ */
 export const timesheetOperations: INodeProperties[] = [
 	{
 		displayName: 'Operation',
@@ -35,8 +52,19 @@ export const timesheetOperations: INodeProperties[] = [
 	},
 ];
 
+/**
+ * Timesheet Fields
+ *
+ * Defines all input fields for timesheet operations.
+ * Fields are grouped by operation using displayOptions.show
+ *
+ * Field Groups:
+ * - Get All: month, year, additionalFields (returnAll, limit)
+ * - Get By Period: startDate, endDate, additionalFields (returnAll, limit)
+ * - Get By User: username, month, year, additionalFields (returnAll, limit)
+ */
 export const timesheetFields: INodeProperties[] = [
-	// Fields for Get All operation
+	// ====== GET ALL OPERATION FIELDS ======
 	{
 		displayName: 'Month',
 		name: 'month',
@@ -74,7 +102,7 @@ export const timesheetFields: INodeProperties[] = [
 		description: 'The year for which to retrieve timesheets',
 	},
 
-	// Fields for Get By Period operation
+	// ====== GET BY PERIOD OPERATION FIELDS ======
 	{
 		displayName: 'Start Date',
 		name: 'startDate',
@@ -104,7 +132,7 @@ export const timesheetFields: INodeProperties[] = [
 		description: 'End date of the period (format: YYYY-MM-DD)',
 	},
 
-	// Fields for Get By User operation
+	// ====== GET BY USER OPERATION FIELDS ======
 	{
 		displayName: 'Username',
 		name: 'username',
@@ -156,16 +184,27 @@ export const timesheetFields: INodeProperties[] = [
 		description: 'The year for which to retrieve timesheets',
 	},
 
-	// Additional options (optional for all operations)
+	// ====== ADDITIONAL FIELDS (SHARED ACROSS ALL OPERATIONS) ======
+	/**
+	 * Optional fields available for all timesheet operations
+	 *
+	 * Return All:
+	 * - When enabled: Uses pagination to fetch all results
+	 * - When disabled: Returns limited results (default 50)
+	 *
+	 * Limit:
+	 * - Only shown when "Return All" is disabled
+	 * - Controls maximum number of results (1-500)
+	 */
 	{
 		displayName: 'Additional Fields',
 		name: 'additionalFields',
-		type: 'collection',
+		type: 'collection', // Collection groups multiple optional fields
 		placeholder: 'Add Field',
 		default: {},
 		displayOptions: {
 			show: {
-				resource: ['timesheet'],
+				resource: ['timesheet'], // Show for all timesheet operations
 			},
 		},
 		options: [
@@ -182,7 +221,7 @@ export const timesheetFields: INodeProperties[] = [
 				type: 'number',
 				displayOptions: {
 					show: {
-						returnAll: [false],
+						returnAll: [false], // Only show when Return All is disabled
 					},
 				},
 				typeOptions: {
