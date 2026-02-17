@@ -1,46 +1,99 @@
 # n8n-nodes-tia
 
-This is an n8n community node. It lets you use _app/service name_ in your n8n workflows.
+This is an n8n community node. It lets you use the **TIA (Time & Invoice Administration)** API in your n8n workflows.
 
-_App/service name_ is _one or two sentences describing the service this node integrates with_.
+TIA is a time registration and invoice management platform by Cronos. This node allows you to retrieve timesheet data from the TIA API.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/sustainable-use-license/) workflow automation platform.
 
-[Installation](#installation)
-[Operations](#operations)
-[Credentials](#credentials)
-[Compatibility](#compatibility)
-[Usage](#usage)
-[Resources](#resources)
+[Installation](#installation) |
+[Operations](#operations) |
+[Credentials](#credentials) |
+[Compatibility](#compatibility) |
+[Usage](#usage) |
+[Resources](#resources) |
 [Version history](#version-history)
 
 ## Installation
 
 Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
 
+### Local Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start n8n with the custom node loaded (recommended)
+npm run dev
+
+# Alternative: use globally installed n8n
+npm run dev:local
+
+# Build only
+npm run build
+```
+
 ## Operations
 
-_List the operations supported by your node._
+### Timesheet
+
+| Operation | Description |
+|-----------|-------------|
+| **Get Many** | Retrieve all timesheets for a specific month and year |
+| **Get By Period** | Retrieve timesheets between a start and end date |
+| **Get By User** | Retrieve timesheets for a specific user by month and year |
+
+All operations support:
+- **Return All**: Fetch all results with automatic pagination
+- **Limit**: Restrict the number of returned results (default: 50)
 
 ## Credentials
 
-_If users need to authenticate with the app/service, provide details here. You should include prerequisites (such as signing up with the service), available authentication methods, and how to set them up._
+To use this node you need the following credentials from your TIA administrator:
+
+| Field | Description |
+|-------|-------------|
+| **Base URL** | The TIA API endpoint (default: `https://api.staging.tia.cronos.be`) |
+| **API Key** | Your TIA API key (used in the `X-apikey` header) |
+| **Username** | Your TIA username |
+| **Password** | Your TIA password |
+
+The node uses token-based authentication:
+1. Credentials are exchanged for a temporary access token via `/v1/Token`
+2. The token is cached and reused until it expires (with a 5-minute safety buffer)
+3. Expired tokens are automatically refreshed
+
+> **Tip:** If your API key or password contains special characters (like quotes), use "Expression" mode in n8n instead of "Fixed" mode.
 
 ## Compatibility
 
-_State the minimum n8n version, as well as which versions you test against. You can also include any known version incompatibility issues._
+- Tested with n8n version **2.6.4** and **2.8.3**
+- Requires Node.js **v18** or higher
 
 ## Usage
 
-_This is an optional section. Use it to help users with any difficult or confusing aspects of the node._
+1. Add the **TIA** node to your workflow
+2. Configure your TIA API credentials
+3. Select the **Timesheet** resource
+4. Choose an operation (Get Many, Get By Period, or Get By User)
+5. Fill in the required parameters (month, year, dates, etc.)
+6. Execute the workflow
 
-_By the time users are looking for community nodes, they probably already know n8n basics. But if you expect new users, you can link to the [Try it out](https://docs.n8n.io/try-it-out/) documentation to help them get started._
+### Date Format (Get By Period)
+
+The TIA API expects dates in the format `yyyy-MM-dd HH:mm:ss:ffZ`. The node handles this conversion automatically - just select your dates using the n8n date picker.
 
 ## Resources
 
-* [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
-* _Link to app/service documentation._
+- [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
+- [TIA API documentation (Swagger)](https://api.staging.tia.cronos.be/scalar/v1)
+- [GitHub repository](https://github.com/Dots-And-Arrows/n8n-custom-node-tia)
 
 ## Version history
 
-_This is another optional section. If your node has multiple versions, include a short description of available versions and what changed, as well as any compatibility impact._
+### 0.1.0
+- Initial release
+- Timesheet resource with Get Many, Get By Period, and Get By User operations
+- Token-based authentication with automatic caching and refresh
+- Pagination support for large datasets
