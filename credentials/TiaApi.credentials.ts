@@ -10,8 +10,8 @@ import type { ICredentialType, INodeProperties, ICredentialTestRequest } from 'n
  *
  * Important: If your API key or password contains special characters (like quotes),
  * use "Expression" mode in n8n instead of "Fixed" mode to ensure proper storage.
- * Alternative and cleaner: create a .env file in the directory where you start your n8n. So if you use npm run dev and your n8n automatically starts with npm run dev, save your .env in the project root. 
- * If you just start n8n on your pc, save your .env file from where your n8n starts, mostly here: ~/.n8n/ 
+ * Alternative and cleaner: create a .env file in the directory where you start your n8n. So if you use npm run dev and your n8n automatically starts with npm run dev, save your .env in the project root.
+ * If you just start n8n on your pc, save your .env file from where your n8n starts, mostly here: ~/.n8n/
  */
 export class TiaApi implements ICredentialType {
 	name = 'tiaApi';
@@ -21,7 +21,7 @@ export class TiaApi implements ICredentialType {
 	documentationUrl = 'https://api.staging.tia.cronos.be/scalar/v1';
 
 	// Custom icons for light and dark themes
-	icon = { light: 'file:tia.svg', dark: 'file:tia.dark.svg' } as const;
+	icon = 'file:dots-and-arrows.svg' as const;
 
 	// Credential fields shown to users in n8n
 	properties: INodeProperties[] = [
