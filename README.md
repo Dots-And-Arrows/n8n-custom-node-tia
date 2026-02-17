@@ -2,7 +2,7 @@
 
 This is an n8n community node. It lets you use the **TIA (Time & Invoice Administration)** API in your n8n workflows.
 
-TIA is a time registration and invoice management platform by Cronos. This node allows you to retrieve timesheet data from the TIA API.
+TIA is a time registration and invoice management platform by Cronos. This node allows you to retrieve timesheet and user data from the TIA API.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/sustainable-use-license/) workflow automation platform.
 
@@ -42,11 +42,17 @@ npm run build
 |-----------|-------------|
 | **Get Many** | Retrieve all timesheets for a specific month and year |
 | **Get By Period** | Retrieve timesheets between a start and end date |
-| **Get By User** | Retrieve timesheets for a specific user by month and year |
+| **Get By User** | Retrieve timesheets for a specific user by month and year (username loaded dynamically from API) |
 
-All operations support:
+All timesheet operations support:
 - **Return All**: Fetch all results with automatic pagination
 - **Limit**: Restrict the number of returned results (default: 50)
+
+### User
+
+| Operation | Description |
+|-----------|-------------|
+| **Get Many** | Retrieve all users from the TIA system |
 
 ## Credentials
 
@@ -75,10 +81,12 @@ The node uses token-based authentication:
 
 1. Add the **TIA** node to your workflow
 2. Configure your TIA API credentials
-3. Select the **Timesheet** resource
+3. Select a resource (**Timesheet** or **User**)
 4. Choose an operation (Get Many, Get By Period, or Get By User)
 5. Fill in the required parameters (month, year, dates, etc.)
 6. Execute the workflow
+
+> **Note:** The "Get By User" operation provides a dynamic dropdown that loads usernames directly from the TIA API, so you don't have to remember them.
 
 ### Date Format (Get By Period)
 
@@ -95,5 +103,7 @@ The TIA API expects dates in the format `yyyy-MM-dd HH:mm:ss:ffZ`. The node hand
 ### 0.1.0
 - Initial release
 - Timesheet resource with Get Many, Get By Period, and Get By User operations
+- User resource with Get Many operation
+- Dynamic username dropdown for Get By User (loads from API)
 - Token-based authentication with automatic caching and refresh
 - Pagination support for large datasets
