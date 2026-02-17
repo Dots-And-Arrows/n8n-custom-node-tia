@@ -134,9 +134,12 @@ export const timesheetFields: INodeProperties[] = [
 
 	// ====== GET BY USER OPERATION FIELDS ======
 	{
-		displayName: 'Username',
+		displayName: 'Username Name or ID',
 		name: 'username',
-		type: 'string',
+		type: 'options',
+		typeOptions: {
+			loadOptionsMethod: 'getUsers',
+		},
 		displayOptions: {
 			show: {
 				resource: ['timesheet'],
@@ -145,7 +148,7 @@ export const timesheetFields: INodeProperties[] = [
 		},
 		default: '',
 		required: true,
-		description: 'Username of the consultant',
+		description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 	},
 	{
 		displayName: 'Month',

@@ -18,7 +18,9 @@
 
 import type {
 	IExecuteFunctions,
+	ILoadOptionsFunctions,
 	INodeExecutionData,
+	INodePropertyOptions,
 	INodeType,
 	INodeTypeDescription,
 	IDataObject,
@@ -100,6 +102,61 @@ export class Tia implements INodeType {
 			...userOperations,
 			...userFields,
 		],
+	};
+
+	/**
+	 * Methods for dynamic option loading
+	 *
+	 * These methods are called by n8n when a field uses loadOptionsMethod.
+	 * They fetch data from the API to populate dropdowns dynamically.
+	 */
+	methods = {
+		loadOptions: {
+			// Fetches all users from TIA API and returns them as dropdown options
+			async getUsers(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const credentials = await this.getCredentials('tiaApi');
+				const baseUrl = credentials.baseUrl as string;
+				const apiKey = credentials.apiKey as string;
+
+				// Get a token first
+				const tokenResponse = await this.helpers.httpRequest({
+					method: 'POST',
+					url: `${baseUrl}/v1/Token`,
+					headers: {
+						'Content-Type': 'application/json',
+						'Accept': 'application/json',
+						'X-apikey': apiKey,
+					},
+					body: {
+						username: credentials.username,
+						password: credentials.password,
+					},
+					json: true,
+				});
+
+				// Fetch users with the token
+				const users = await this.helpers.httpRequest({
+					method: 'GET',
+					url: `${baseUrl}/v1/User`,
+					headers: {
+						'Content-Type': 'application/json',
+						'X-apikey': apiKey,
+						Authorization: `Access_token ${tokenResponse.token}`,
+					},
+					json: true,
+				});
+
+				// Map users to dropdown options
+				if (Array.isArray(users)) {
+					return users.map((user: IDataObject) => ({
+						name: (user.username as string) || (user.userName as string) || String(user.id),
+						value: (user.username as string) || (user.userName as string) || String(user.id),
+					}));
+				}
+
+				return [];
+			},
+		},
 	};
 
 	/**
