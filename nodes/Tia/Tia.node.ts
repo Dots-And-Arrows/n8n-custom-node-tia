@@ -26,6 +26,7 @@ import type {
 import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
 
 import { timesheetOperations, timesheetFields } from './descriptions';
+import { userOperations, userFields } from './descriptions/UserDescription';
 import { tiaApiRequest, tiaApiRequestAllItems } from './helpers/tiaApi';
 
 /**
@@ -84,7 +85,11 @@ export class Tia implements INodeType {
 						value: 'timesheet',
 						description: 'Operations on timesheets (Uren)',
 					},
-					// Future resources can be added here (e.g., Invoices, Projects)
+					{
+						name: 'User',
+						value: 'user',
+						description: 'Get user details',
+					},
 				],
 				default: 'timesheet',
 			},
@@ -92,6 +97,8 @@ export class Tia implements INodeType {
 			// This modular approach keeps the code organized and maintainable
 			...timesheetOperations, // Operation dropdown (Get Many, Get By Period, etc.)
 			...timesheetFields, // Fields for each operation (dates, limits, etc.)
+			...userOperations,
+			...userFields,
 		],
 	};
 
@@ -257,6 +264,26 @@ export class Tia implements INodeType {
 						}
 
 						// Format response data for n8n
+						if (Array.isArray(responseData)) {
+							responseData.forEach((item) => {
+								returnData.push({
+									json: item,
+									pairedItem: { item: i },
+								});
+							});
+						} else {
+							returnData.push({
+								json: responseData,
+								pairedItem: { item: i },
+							});
+						}
+					}
+				} else if (resource === 'user') {
+					if (operation === 'getAll') {
+						const endpoint = '/v1/User';
+
+						const responseData = await tiaApiRequest.call(this, 'GET', endpoint);
+
 						if (Array.isArray(responseData)) {
 							responseData.forEach((item) => {
 								returnData.push({
