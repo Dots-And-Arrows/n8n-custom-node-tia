@@ -47,7 +47,7 @@ export class Tia implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'TIA',
 		name: 'tia',
-		icon: { light: 'file:Tia.svg', dark: 'file:Tia.dark.svg' },
+		icon: 'file:dots-and-arrows.svg',
 		group: ['transform'], // Node category in n8n
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}', // Dynamic subtitle
