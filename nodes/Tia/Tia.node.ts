@@ -2,18 +2,20 @@
  * TIA Custom Node for n8n
  *
  * This node provides integration with the TIA API,
- * allowing users to retrieve and manage timesheet data within n8n workflows.
+ * allowing users to retrieve and manage timesheets, invoice lines, and user data within n8n workflows.
  *
  * Current Features:
- * - Get timesheets for a specific month/year
- * - Get timesheets for a date period
- * - Get timesheets for a specific user
+ * - Timesheet operations: Get by month/year, period, or user
+ * - User operations: Get all users
+ * - Invoice Line operations: Search with date and status filters
  *
  * Architecture:
  * - Tia.node.ts: Main node logic and execution
  * - descriptions/: Field and operation definitions (modular, one file per resource)
  * - helpers/tiaApi.ts: API authentication and request handling
  * - credentials/TiaApi.credentials.ts: Credential configuration
+ *
+ * For detailed developer documentation, see DEVELOPER.md in the project root.
  */
 
 import type {
@@ -27,8 +29,14 @@ import type {
 } from 'n8n-workflow';
 import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
 
-import { timesheetOperations, timesheetFields } from './descriptions';
-import { userOperations, userFields } from './descriptions/UserDescription';
+import {
+	timesheetOperations,
+	timesheetFields,
+	userOperations,
+	userFields,
+	invoiceLineOperations,
+	invoiceLinesFields,
+} from './descriptions';
 import { tiaApiRequest, tiaApiRequestAllItems } from './helpers/tiaApi';
 
 /**
@@ -83,6 +91,11 @@ export class Tia implements INodeType {
 				noDataExpression: true,
 				options: [
 					{
+						name: 'Invoice Line',
+						value: 'invoiceLine',
+						description: 'Search and manage invoice lines',
+					},
+					{
 						name: 'Timesheet',
 						value: 'timesheet',
 						description: 'Operations on timesheets (Uren)',
@@ -101,6 +114,8 @@ export class Tia implements INodeType {
 			...timesheetFields, // Fields for each operation (dates, limits, etc.)
 			...userOperations,
 			...userFields,
+			...invoiceLineOperations,
+			...invoiceLinesFields,
 		],
 	};
 
@@ -351,6 +366,95 @@ export class Tia implements INodeType {
 						} else {
 							returnData.push({
 								json: responseData,
+								pairedItem: { item: i },
+							});
+						}
+					}
+				} else if (resource === 'invoiceLine') {
+					// ====== INVOICE LINE OPERATIONS ======
+
+					if (operation === 'search') {
+						/**
+						 * SEARCH INVOICE LINES
+						 * Search invoice lines with optional filters
+						 * Endpoint: GET /v1/InvoiceLine/search?createdFrom=...&statusId=...
+						 */
+						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
+						const limit = this.getNodeParameter('limit', i, 50) as number;
+						const createdFrom = this.getNodeParameter('createdFrom', i, '') as string;
+						const statusId = this.getNodeParameter('statusId', i, '') as string | number;
+
+						// Build query string parameters
+						const qs: IDataObject = {};
+
+						// Add createdFrom filter if provided
+						if (createdFrom) {
+							// Convert n8n date to TIA format: yyyy-MM-dd HH:mm:ss:ffZ
+							const formattedDate = createdFrom.split('T')[0] + ' 00:00:00:00Z';
+							qs.createdFrom = formattedDate;
+						}
+
+						// Add statusId filter if provided
+						if (statusId !== '') {
+							qs.statusId = statusId;
+						}
+
+						const endpoint = '/v1/InvoiceLine/search';
+
+						let responseData: IDataObject | IDataObject[];
+
+						// Check if user wants all results or limited results
+						if (returnAll) {
+							// Fetch all pages using pagination
+							responseData = await tiaApiRequestAllItems.call(this, 'GET', endpoint, undefined, qs);
+						} else {
+							// Fetch first page from API (API doesn't support limit parameter)
+							responseData = await tiaApiRequest.call(this, 'GET', endpoint, undefined, qs);
+						}
+
+						// Extract invoiceLines array from response
+						// API can return different structures:
+						// - [{ "invoiceLines": [...] }] (wrapped)
+						// - { "invoiceLines": [...] } (unwrapped object)
+						// - [...] (direct array)
+						let invoiceLines: IDataObject[] = [];
+
+						if (Array.isArray(responseData)) {
+							// Check if it's a wrapped response: [{ "invoiceLines": [...] }]
+							if (responseData.length > 0) {
+								const firstItem = responseData[0] as IDataObject;
+								if (firstItem.invoiceLines && Array.isArray(firstItem.invoiceLines)) {
+									invoiceLines = firstItem.invoiceLines as IDataObject[];
+								} else {
+									// Direct array of invoice lines
+									invoiceLines = responseData as IDataObject[];
+								}
+							}
+						} else if (responseData && typeof responseData === 'object') {
+							// Unwrapped object: { "invoiceLines": [...] }
+							const dataObj = responseData as IDataObject;
+							if (dataObj.invoiceLines && Array.isArray(dataObj.invoiceLines)) {
+								invoiceLines = dataObj.invoiceLines as IDataObject[];
+							}
+						}
+
+						// Apply limit client-side if not returning all
+						if (!returnAll && invoiceLines.length > limit) {
+							invoiceLines = invoiceLines.slice(0, limit);
+						}
+
+						// Format response data for n8n
+						if (invoiceLines.length > 0) {
+							invoiceLines.forEach((item) => {
+								returnData.push({
+									json: item,
+									pairedItem: { item: i },
+								});
+							});
+						} else {
+							// No invoice lines found - return raw response for debugging
+							returnData.push({
+								json: { message: 'No invoice lines found', rawResponse: responseData },
 								pairedItem: { item: i },
 							});
 						}
