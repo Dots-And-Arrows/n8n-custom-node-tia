@@ -46,7 +46,7 @@ npm run build
 
 All timesheet operations support:
 - **Return All**: Fetch all results with automatic pagination
-- **Limit**: Restrict the number of returned results (default: 50)
+- **Limit**: Restrict the number of returned results (default: 10)
 
 ### User
 

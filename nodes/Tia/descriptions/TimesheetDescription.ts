@@ -148,7 +148,8 @@ export const timesheetFields: INodeProperties[] = [
 		},
 		default: '',
 		required: true,
-		description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+		description:
+			'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 	},
 	{
 		displayName: 'Month',
@@ -231,7 +232,17 @@ export const timesheetFields: INodeProperties[] = [
 					minValue: 1,
 					maxValue: 500,
 				},
-				default: 50,
+				/**
+				 * Custom default: 10 instead of n8n's standard 50
+				 *
+				 * Reason: Provides better UX with a smaller initial dataset. Most users
+				 * query timesheets for recent entries and don't need 50 results at once.
+				 * This reduces data transfer and improves response time.
+				 *
+				 * ESLint override: n8n-nodes-base/node-param-default-wrong-for-limit enforces 50
+				 */
+				// eslint-disable-next-line n8n-nodes-base/node-param-default-wrong-for-limit
+				default: 10,
 				description: 'Max number of results to return',
 			},
 		],

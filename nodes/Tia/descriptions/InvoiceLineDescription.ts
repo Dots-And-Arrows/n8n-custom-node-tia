@@ -71,7 +71,17 @@ export const invoiceLinesFields: INodeProperties[] = [
 		typeOptions: {
 			minValue: 1,
 		},
-		default: 50,
+		/**
+		 * Custom default: 10 instead of n8n's standard 50
+		 *
+		 * Reason: Invoice line objects contain large nested structures (customer, supplier,
+		 * product, etc.). Using 10 as default reduces initial data transfer and provides
+		 * better UX for users who typically need only recent results.
+		 *
+		 * ESLint override: n8n-nodes-base/node-param-default-wrong-for-limit enforces 50
+		 */
+		// eslint-disable-next-line n8n-nodes-base/node-param-default-wrong-for-limit
+		default: 10,
 		description: 'Max number of results to return',
 	},
 	{

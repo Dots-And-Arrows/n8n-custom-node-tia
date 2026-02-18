@@ -411,6 +411,113 @@ To add a new resource (e.g., "Project"):
 
 6. **Test and document**: Update README.md with the new resource.
 
+## Overriding ESLint Rules
+
+n8n enforces strict linting rules for custom nodes to ensure consistency and best practices. However, sometimes you need to deviate from these rules for valid reasons.
+
+### When to Override Rules
+
+Only override ESLint rules when you have a **good reason** and understand the implications. Common valid reasons:
+- **Custom defaults**: n8n enforces `limit` default of 50, but your API or use case needs a different value
+- **API-specific constraints**: Your API has different conventions than n8n's standards
+- **Intentional design decisions**: You've made a conscious choice to deviate from the standard
+
+### How to Override Rules
+
+**Method 1: Inline Comments (Recommended for specific cases)**
+
+Use `eslint-disable-next-line` to disable a rule for a single line:
+
+```typescript
+// Disable rule for the next line only
+// eslint-disable-next-line n8n-nodes-base/node-param-default-wrong-for-limit
+default: 10,
+```
+
+**Better: Add explanation of WHY you're disabling the rule:**
+
+```typescript
+// We use a default of 10 instead of n8n's standard 50 because our API
+// returns large objects and 50 results would be too much data
+// eslint-disable-next-line n8n-nodes-base/node-param-default-wrong-for-limit
+default: 10,
+```
+
+**Method 2: File-level Comments (For multiple violations in one file)**
+
+At the top of the file:
+
+```typescript
+/* eslint-disable n8n-nodes-base/node-param-default-wrong-for-limit */
+// ... rest of file
+```
+
+**Method 3: Project-level Config (For project-wide overrides)**
+
+Create `.eslintrc.js` in the project root:
+
+```javascript
+module.exports = {
+  rules: {
+    'n8n-nodes-base/node-param-default-wrong-for-limit': 'off',
+  },
+};
+```
+
+**Note**: The n8n build tool may not always respect `.eslintrc.js` files, so inline comments are more reliable.
+
+### Common n8n ESLint Rules
+
+| Rule | Purpose | When to Override |
+|------|---------|-----------------|
+| `node-param-default-wrong-for-limit` | Enforces limit default of 50 | When you need a different default limit (explain why in comments) |
+| `node-param-display-name-wrong-for-dynamic-options` | Requires "Name or ID" suffix for dynamic options | Rarely (this is important for UX) |
+| `node-param-placeholder-miscased-id` | Enforces proper casing for ID placeholders | Very rarely (usually indicates a real issue) |
+
+### Example: Custom Limit Default
+
+In this project, we use a limit default of 10 instead of 50:
+
+```typescript
+{
+  displayName: 'Limit',
+  name: 'limit',
+  type: 'number',
+  typeOptions: {
+    minValue: 1,
+  },
+  // We use 10 as default instead of n8n's standard 50 because:
+  // - Invoice line objects are large with nested data
+  // - Most users need only recent results
+  // - Reduces initial load time and data transfer
+  // eslint-disable-next-line n8n-nodes-base/node-param-default-wrong-for-limit
+  default: 10,
+  description: 'Max number of results to return',
+}
+```
+
+**Files with ESLint overrides:**
+- `descriptions/InvoiceLineDescription.ts` - Custom limit default (10 instead of 50)
+- `descriptions/TimesheetDescription.ts` - Custom limit default (10 instead of 50)
+
+### Finding Rule Names
+
+If you need to disable a rule but don't know its name, run ESLint with JSON output:
+
+```bash
+npx eslint path/to/file.ts --format=json
+```
+
+This shows the `ruleId` field which is the exact rule name to use in disable comments.
+
+### Best Practices
+
+1. **Document WHY**: Always add a comment explaining why you're disabling the rule
+2. **Be specific**: Use `eslint-disable-next-line` instead of disabling for entire files
+3. **Review regularly**: Periodically check if the override is still necessary
+4. **Minimize overrides**: Only disable rules when truly needed
+5. **Team discussion**: For project-wide overrides, discuss with the team first
+
 ## Code Style
 
 - Use TypeScript strict mode

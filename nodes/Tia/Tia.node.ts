@@ -139,7 +139,7 @@ export class Tia implements INodeType {
 					url: `${baseUrl}/v1/Token`,
 					headers: {
 						'Content-Type': 'application/json',
-						'Accept': 'application/json',
+						Accept: 'application/json',
 						'X-apikey': apiKey,
 					},
 					body: {
@@ -229,7 +229,7 @@ export class Tia implements INodeType {
 							// Fetch single page
 							responseData = await tiaApiRequest.call(this, 'GET', endpoint);
 
-							// Apply limit if specified (default 50)
+							// Apply limit if specified (default 10)
 							if (additionalFields.limit && Array.isArray(responseData)) {
 								responseData = responseData.slice(0, additionalFields.limit as number);
 							}
@@ -261,7 +261,7 @@ export class Tia implements INodeType {
 						 * NOTE: TIA API requires specific date format:
 						 * - Format: yyyy-MM-dd HH:mm:ss:ffZ
 						 * - Example: 2025-01-20 00:00:00:00Z
-						 * - Alternative: yyyyMMdd (20250120) but may have issues
+						 * - Alternative: yyyyMMdd (20250120)
 						 */
 						const startDate = this.getNodeParameter('startDate', i) as string;
 						const endDate = this.getNodeParameter('endDate', i) as string;
@@ -286,7 +286,7 @@ export class Tia implements INodeType {
 							// Fetch single page
 							responseData = await tiaApiRequest.call(this, 'GET', endpoint);
 
-							// Apply limit if specified (default 50)
+							// Apply limit if specified (default 10)
 							if (additionalFields.limit && Array.isArray(responseData)) {
 								responseData = responseData.slice(0, additionalFields.limit as number);
 							}
@@ -329,7 +329,7 @@ export class Tia implements INodeType {
 							// Fetch single page
 							responseData = await tiaApiRequest.call(this, 'GET', endpoint);
 
-							// Apply limit if specified (default 50)
+							// Apply limit if specified (default 10)
 							if (additionalFields.limit && Array.isArray(responseData)) {
 								responseData = responseData.slice(0, additionalFields.limit as number);
 							}
@@ -380,7 +380,7 @@ export class Tia implements INodeType {
 						 * Endpoint: GET /v1/InvoiceLine/search?createdFrom=...&statusId=...
 						 */
 						const returnAll = this.getNodeParameter('returnAll', i) as boolean;
-						const limit = this.getNodeParameter('limit', i, 50) as number;
+						const limit = this.getNodeParameter('limit', i, 10) as number;
 						const createdFrom = this.getNodeParameter('createdFrom', i, '') as string;
 						const statusId = this.getNodeParameter('statusId', i, '') as string | number;
 
