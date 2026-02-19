@@ -31,7 +31,7 @@ export class TiaApi implements ICredentialType {
 			type: 'string',
 			default: 'https://api.staging.tia.cronos.be',
 			required: true,
-			// TIP: Change to production URL when deploying: https://api.tia.cronos.be
+			//Change to production URL when deploying: https://api.tia.cronos.be
 		},
 		{
 			displayName: 'API Key',
@@ -70,6 +70,7 @@ export class TiaApi implements ICredentialType {
 	 *
 	 * If successful: All credentials are valid and the connection works
 	 * If failed: Either credentials are wrong or API is unreachable
+	 * $credentials is not declared anywhere, it's a build in n8n expression variable.
 	 */
 	test: ICredentialTestRequest = {
 		request: {

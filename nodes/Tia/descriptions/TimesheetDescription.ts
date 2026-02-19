@@ -63,13 +63,17 @@ export const timesheetOperations: INodeProperties[] = [
  * - Get By Period: startDate, endDate, additionalFields (returnAll, limit)
  * - Get By User: username, month, year, additionalFields (returnAll, limit)
  */
+// Dynamic defaults: evaluated once when n8n loads the node
+const currentYear = new Date().getFullYear();
+const currentMonth = new Date().getMonth() + 1; // getMonth() is 0-indexed
+
 export const timesheetFields: INodeProperties[] = [
 	// ====== GET ALL OPERATION FIELDS ======
 	{
 		displayName: 'Month',
 		name: 'month',
 		type: 'number',
-		default: 1,
+		default: currentMonth,
 		typeOptions: {
 			minValue: 1,
 			maxValue: 12,
@@ -87,7 +91,7 @@ export const timesheetFields: INodeProperties[] = [
 		displayName: 'Year',
 		name: 'year',
 		type: 'number',
-		default: 2025,
+		default: currentYear,
 		typeOptions: {
 			minValue: 2000,
 			maxValue: 2100,
@@ -155,7 +159,7 @@ export const timesheetFields: INodeProperties[] = [
 		displayName: 'Month',
 		name: 'month',
 		type: 'number',
-		default: 1,
+		default: currentMonth,
 		typeOptions: {
 			minValue: 1,
 			maxValue: 12,
@@ -173,7 +177,7 @@ export const timesheetFields: INodeProperties[] = [
 		displayName: 'Year',
 		name: 'year',
 		type: 'number',
-		default: 2025,
+		default: currentYear,
 		typeOptions: {
 			minValue: 2000,
 			maxValue: 2100,
