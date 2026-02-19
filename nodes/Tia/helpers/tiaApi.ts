@@ -228,6 +228,23 @@ export async function tiaApiRequest(
 			}
 		}
 
+		// Handle 404 Not Found errors with a clear message
+		// This typically means the endpoint or resource doesn't exist
+		if (error.statusCode === 404) {
+			throw new NodeApiError(this.getNode(), error, {
+				message: `TIA API resource not found: ${method} ${endpoint}`,
+				description: `The requested resource was not found (404).\n\nPossible causes:\n- The endpoint "${endpoint}" does not exist on this TIA API version\n- The resource ID in the URL is invalid or has been deleted\n- The Base URL may be incorrect: ${baseUrl}\n\nCheck the TIA API documentation for available endpoints.`,
+			});
+		}
+
+		// Handle 429 Rate Limit errors
+		if (error.statusCode === 429) {
+			throw new NodeApiError(this.getNode(), error, {
+				message: `TIA API rate limit exceeded: ${method} ${endpoint}`,
+				description: 'Too many requests. Please wait a moment and try again.\n\nTip: If you are loading dynamic dropdowns (e.g. username list), this can trigger rate limits. Wait a few seconds and reload.',
+			});
+		}
+
 		// Handle all other errors with detailed debugging information
 		const errorMessage = error.message || 'Unknown error';
 		const statusCode = error.statusCode || error.status || 'No status code';
