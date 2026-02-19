@@ -128,6 +128,33 @@ Two main helper functions handle API communication:
   - Used when `returnAll` is true
   - Combines results from all pages
 
+### Error Handling
+
+All API errors are handled in `tiaApiRequest()` with specific handlers for common HTTP status codes. Each handler provides a clear, actionable error message to help users debug issues.
+
+| Status Code | Error | Handling |
+|-------------|-------|----------|
+| **401** | Unauthorized (expired token) | Clears cached token, fetches a fresh one, and retries the request once. If the retry also fails, the token is likely invalid (not just expired). |
+| **404** | Not Found | Returns a clear message indicating the endpoint or resource doesn't exist. Suggests checking the endpoint path, resource ID, and Base URL. |
+| **429** | Rate Limit Exceeded | Tells the user to wait and retry. Includes a tip about dynamic dropdowns (e.g. username list) which can trigger rate limits. |
+| **Other** | Any other error | Returns full debugging context: status code, error message, and raw response body. |
+
+**Error handling flow in `tiaApiRequest()`:**
+
+```
+API Request
+  ├── Success → Return response data
+  └── Error
+       ├── 401 → Clear token cache → Get fresh token → Retry once
+       │          ├── Retry success → Return response data
+       │          └── Retry fails → Throw "failed after token refresh"
+       ├── 404 → Throw with endpoint/URL debugging info
+       ├── 429 → Throw with rate limit message
+       └── Other → Throw with full error context
+```
+
+**Adding new error handlers**: To add handling for a new status code, add a new `if (error.statusCode === XXX)` block in the catch clause of `tiaApiRequest()`, before the generic error handler at the bottom.
+
 ### Date Format
 
 TIA API requires a specific date format: `yyyy-MM-dd HH:mm:ss:ffZ`
