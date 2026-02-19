@@ -2,7 +2,7 @@
 
 This is an n8n community node. It lets you use the **TIA (Time & Invoice Administration)** API in your n8n workflows.
 
-TIA is a time registration and invoice management platform by Cronos. This node allows you to retrieve timesheet and user data from the TIA API.
+TIA is a time registration and invoice management platform by Cronos. This node allows you to retrieve timesheet data, manage invoice lines, and access user information from the TIA API.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/sustainable-use-license/) workflow automation platform.
 
@@ -46,13 +46,32 @@ npm run build
 
 All timesheet operations support:
 - **Return All**: Fetch all results with automatic pagination
-- **Limit**: Restrict the number of returned results (default: 50)
+- **Limit**: Restrict the number of returned results (default: 10)
 
 ### User
 
 | Operation | Description |
 |-----------|-------------|
 | **Get Many** | Retrieve all users from the TIA system |
+
+### Invoice Line
+
+| Operation | Description |
+|-----------|-------------|
+| **Search** | Search and filter invoice lines with optional date and status filters |
+
+**Available Filters:**
+- **Created After**: Return invoice lines created on or after a specific date
+- **Status ID**: Filter by invoice line status
+  - `Any`: No status filter (returns all)
+  - `Invoiced (6)`: Only invoiced lines
+  - `Proforma / Draft (1)`: Only draft/proforma lines
+
+**Pagination Options:**
+- **Return All**: Fetch all matching results with automatic pagination
+- **Limit**: Restrict the number of returned results (default: 50, applied client-side)
+
+> **Note:** The TIA API returns invoice lines in different formats depending on query parameters. The node automatically detects and handles these formats.
 
 ## Credentials
 
@@ -81,9 +100,9 @@ The node uses token-based authentication:
 
 1. Add the **TIA** node to your workflow
 2. Configure your TIA API credentials
-3. Select a resource (**Timesheet** or **User**)
-4. Choose an operation (Get Many, Get By Period, or Get By User)
-5. Fill in the required parameters (month, year, dates, etc.)
+3. Select a resource (**Timesheet**, **User**, or **Invoice Line**)
+4. Choose an operation
+5. Fill in the required parameters (dates, filters, etc.)
 6. Execute the workflow
 
 > **Note:** The "Get By User" operation provides a dynamic dropdown that loads usernames directly from the TIA API, so you don't have to remember them.
@@ -102,8 +121,13 @@ The TIA API expects dates in the format `yyyy-MM-dd HH:mm:ss:ffZ`. The node hand
 
 ### 0.1.0
 - Initial release
-- Timesheet resource with Get Many, Get By Period, and Get By User operations
-- User resource with Get Many operation
+- **Timesheet resource** with Get Many, Get By Period, and Get By User operations
+- **User resource** with Get Many operation
+- **Invoice Line resource** with Search operation
+  - Filter by creation date (Created After)
+  - Filter by status (Invoiced, Proforma/Draft, or Any)
+  - Client-side limit support
+  - Automatic detection and handling of different API response formats
 - Dynamic username dropdown for Get By User (loads from API)
 - Token-based authentication with automatic caching and refresh
 - Pagination support for large datasets
