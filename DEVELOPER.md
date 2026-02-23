@@ -35,6 +35,7 @@ n8n-nodes-tia/
 ### Modular Design
 
 Each resource (Timesheet, User, Invoice Line) has its own description file containing:
+
 - **Operations**: Dropdown options for what actions can be performed
 - **Fields**: Input fields that appear based on the selected operation
 
@@ -66,12 +67,12 @@ Description files export two arrays:
 
 ```typescript
 export const timesheetOperations: INodeProperties[] = [
-  // Defines the operation dropdown
+	// Defines the operation dropdown
 ];
 
 export const timesheetFields: INodeProperties[] = [
-  // Defines input fields for each operation
-  // Uses displayOptions.show to conditionally display fields
+	// Defines input fields for each operation
+	// Uses displayOptions.show to conditionally display fields
 ];
 ```
 
@@ -97,6 +98,7 @@ export const timesheetFields: INodeProperties[] = [
 The TIA API uses token-based authentication:
 
 1. **Initial Request**: Exchange credentials for access token
+
    ```
    POST /v1/Token
    Headers: X-apikey, Content-Type
@@ -105,6 +107,7 @@ The TIA API uses token-based authentication:
    ```
 
 2. **Subsequent Requests**: Use the token
+
    ```
    GET /v1/Resource
    Headers: X-apikey, Authorization: Access_token {token}
@@ -132,12 +135,12 @@ Two main helper functions handle API communication:
 
 All API errors are handled in `tiaApiRequest()` with specific handlers for common HTTP status codes. Each handler provides a clear, actionable error message to help users debug issues.
 
-| Status Code | Error | Handling |
-|-------------|-------|----------|
-| **401** | Unauthorized (expired token) | Clears cached token, fetches a fresh one, and retries the request once. If the retry also fails, the token is likely invalid (not just expired). |
-| **404** | Not Found | Returns a clear message indicating the endpoint or resource doesn't exist. Suggests checking the endpoint path, resource ID, and Base URL. |
-| **429** | Rate Limit Exceeded | Tells the user to wait and retry. Includes a tip about dynamic dropdowns (e.g. username list) which can trigger rate limits. |
-| **Other** | Any other error | Returns full debugging context: status code, error message, and raw response body. |
+| Status Code | Error                        | Handling                                                                                                                                         |
+| ----------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **401**     | Unauthorized (expired token) | Clears cached token, fetches a fresh one, and retries the request once. If the retry also fails, the token is likely invalid (not just expired). |
+| **404**     | Not Found                    | Returns a clear message indicating the endpoint or resource doesn't exist. Suggests checking the endpoint path, resource ID, and Base URL.       |
+| **429**     | Rate Limit Exceeded          | Tells the user to wait and retry. Includes a tip about dynamic dropdowns (e.g. username list) which can trigger rate limits.                     |
+| **Other**   | Any other error              | Returns full debugging context: status code, error message, and raw response body.                                                               |
 
 **Error handling flow in `tiaApiRequest()`:**
 
@@ -160,6 +163,7 @@ API Request
 TIA API requires a specific date format: `yyyy-MM-dd HH:mm:ss:ffZ`
 
 **Conversion Pattern**:
+
 ```typescript
 // n8n provides: "2025-01-20T00:00:00" (ISO 8601)
 // TIA expects: "2025-01-20 00:00:00:00Z"
@@ -175,6 +179,7 @@ For end dates, use `23:59:59:99Z` to include the entire day.
 **Problem**: The TIA API `/v1/InvoiceLine/search` endpoint returns different response formats depending on query parameters.
 
 **Formats Observed**:
+
 1. **Wrapped Array**: `[{ "invoiceLines": [...] }]`
    - Usually when no filters are applied
 
@@ -190,22 +195,22 @@ For end dates, use `23:59:59:99Z` to include the entire day.
 let invoiceLines: IDataObject[] = [];
 
 if (Array.isArray(responseData)) {
-  if (responseData.length > 0) {
-    const firstItem = responseData[0] as IDataObject;
-    if (firstItem.invoiceLines && Array.isArray(firstItem.invoiceLines)) {
-      // Wrapped: [{ "invoiceLines": [...] }]
-      invoiceLines = firstItem.invoiceLines as IDataObject[];
-    } else {
-      // Direct: [invoice1, invoice2, ...]
-      invoiceLines = responseData as IDataObject[];
-    }
-  }
+	if (responseData.length > 0) {
+		const firstItem = responseData[0] as IDataObject;
+		if (firstItem.invoiceLines && Array.isArray(firstItem.invoiceLines)) {
+			// Wrapped: [{ "invoiceLines": [...] }]
+			invoiceLines = firstItem.invoiceLines as IDataObject[];
+		} else {
+			// Direct: [invoice1, invoice2, ...]
+			invoiceLines = responseData as IDataObject[];
+		}
+	}
 } else if (responseData && typeof responseData === 'object') {
-  // Unwrapped: { "invoiceLines": [...] }
-  const dataObj = responseData as IDataObject;
-  if (dataObj.invoiceLines && Array.isArray(dataObj.invoiceLines)) {
-    invoiceLines = dataObj.invoiceLines as IDataObject[];
-  }
+	// Unwrapped: { "invoiceLines": [...] }
+	const dataObj = responseData as IDataObject;
+	if (dataObj.invoiceLines && Array.isArray(dataObj.invoiceLines)) {
+		invoiceLines = dataObj.invoiceLines as IDataObject[];
+	}
 }
 ```
 
@@ -219,11 +224,12 @@ This ensures the node works regardless of which format the API returns.
 
 ```typescript
 if (!returnAll && invoiceLines.length > limit) {
-  invoiceLines = invoiceLines.slice(0, limit);
+	invoiceLines = invoiceLines.slice(0, limit);
 }
 ```
 
 **Why This Matters**:
+
 - Users expect the limit parameter to work
 - We can't control API results, but we can trim them
 - This is only applied when `returnAll` is false
@@ -233,7 +239,9 @@ if (!returnAll && invoiceLines.length > limit) {
 The "Get By User" operation for timesheets uses a dynamic dropdown populated from the API.
 
 **Implementation**:
+
 1. Define `loadOptionsMethod` in the field definition:
+
    ```typescript
    {
      displayName: 'Username Name or ID',
@@ -248,12 +256,12 @@ The "Get By User" operation for timesheets uses a dynamic dropdown populated fro
 2. Implement the method in `methods.loadOptions`:
    ```typescript
    methods = {
-     loadOptions: {
-       async getUsers(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-         // Fetch users from API
-         // Return array of { name, value } objects
-       },
-     },
+   	loadOptions: {
+   		async getUsers(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+   			// Fetch users from API
+   			// Return array of { name, value } objects
+   		},
+   	},
    };
    ```
 
@@ -264,24 +272,28 @@ The "Get By User" operation for timesheets uses a dynamic dropdown populated fro
 ### Local Development
 
 1. **Install dependencies**:
+
    ```bash
    npm install
    ```
 
-2. **Start n8n with the custom node**:
+2. **Build before you run**:
+
+   ```bash
+   npm run build
+   ```
+
+3. **Start n8n with the custom node**:
+
    ```bash
    npm run dev
    ```
+
    This starts n8n with the custom node loaded from your local directory.
 
-3. **Alternative (use global n8n)**:
+4. **Alternative (use global n8n)**:
    ```bash
    npm run dev:local
-   ```
-
-4. **Build only**:
-   ```bash
-   npm run build
    ```
 
 ### Testing Workflow
@@ -298,10 +310,11 @@ The "Get By User" operation for timesheets uses a dynamic dropdown populated fro
 
 **Check the API Response**:
 The code includes debugging fallbacks. For example, when no invoice lines are found:
+
 ```typescript
 returnData.push({
-  json: { message: 'No invoice lines found', rawResponse: responseData },
-  pairedItem: { item: i },
+	json: { message: 'No invoice lines found', rawResponse: responseData },
+	pairedItem: { item: i },
 });
 ```
 
@@ -309,6 +322,7 @@ This lets you see exactly what the API returned.
 
 **Check Token Issues**:
 Token authentication errors usually appear as 401/403 responses. Check:
+
 - API key is correct
 - Username/password are correct
 - Token hasn't expired (though auto-refresh should handle this)
@@ -323,6 +337,7 @@ If date-based queries fail, verify the date format conversion. The API is strict
 **Cause**: Old npx cache or n8n version mismatch
 
 **Fix**:
+
 ```bash
 # Update global n8n
 npm install -g n8n@latest
@@ -339,6 +354,7 @@ npm run dev:local
 **Cause**: n8n database schema changed
 
 **Fix**: Back up and reset the database:
+
 ```bash
 cp ~/.n8n/database.sqlite ~/.n8n/database.sqlite.backup
 rm ~/.n8n/database.sqlite
@@ -350,6 +366,7 @@ rm ~/.n8n/database.sqlite
 **Cause**: API doesn't support limit parameter
 
 **Expected**: This is working as designed - limit is applied client-side. If you're still seeing all results, check:
+
 1. The code is properly extracting the invoice lines array
 2. The limit is being applied after extraction (not before)
 3. You've rebuilt after code changes: `npm run build`
@@ -363,11 +380,13 @@ rm ~/.n8n/database.sqlite
 ### Issue: Dynamic dropdown not loading
 
 **Cause**:
+
 - API request failed (check credentials)
 - Method name mismatch
 - Rate limiting (429 response)
 
 **Fix**:
+
 - Verify credentials are configured
 - Check method name matches `loadOptionsMethod` value
 - Wait a moment if rate limited
@@ -377,33 +396,34 @@ rm ~/.n8n/database.sqlite
 To add a new resource (e.g., "Project"):
 
 1. **Create description file**: `descriptions/ProjectDescription.ts`
+
    ```typescript
    import type { INodeProperties } from 'n8n-workflow';
 
    export const projectOperations: INodeProperties[] = [
-     {
-       displayName: 'Operation',
-       name: 'operation',
-       type: 'options',
-       displayOptions: { show: { resource: ['project'] } },
-       options: [
-         { name: 'Get Many', value: 'getAll', action: 'Get many projects' },
-       ],
-       default: 'getAll',
-     },
+   	{
+   		displayName: 'Operation',
+   		name: 'operation',
+   		type: 'options',
+   		displayOptions: { show: { resource: ['project'] } },
+   		options: [{ name: 'Get Many', value: 'getAll', action: 'Get many projects' }],
+   		default: 'getAll',
+   	},
    ];
 
    export const projectFields: INodeProperties[] = [
-     // Define fields for each operation
+   	// Define fields for each operation
    ];
    ```
 
 2. **Export from index**: `descriptions/index.ts`
+
    ```typescript
    export * from './ProjectDescription';
    ```
 
 3. **Add to resource list**: `Tia.node.ts`
+
    ```typescript
    {
      displayName: 'Resource',
@@ -415,24 +435,26 @@ To add a new resource (e.g., "Project"):
    ```
 
 4. **Import and spread fields**: `Tia.node.ts`
+
    ```typescript
    import { projectOperations, projectFields } from './descriptions';
 
    properties: [
-     // ... existing properties
-     ...projectOperations,
-     ...projectFields,
-   ]
+   	// ... existing properties
+   	...projectOperations,
+   	...projectFields,
+   ];
    ```
 
 5. **Implement execute logic**: `Tia.node.ts`
+
    ```typescript
    if (resource === 'project') {
-     if (operation === 'getAll') {
-       const endpoint = '/v1/Project';
-       const responseData = await tiaApiRequest.call(this, 'GET', endpoint);
-       // Format and return data
-     }
+   	if (operation === 'getAll') {
+   		const endpoint = '/v1/Project';
+   		const responseData = await tiaApiRequest.call(this, 'GET', endpoint);
+   		// Format and return data
+   	}
    }
    ```
 
@@ -445,6 +467,7 @@ n8n enforces strict linting rules for custom nodes to ensure consistency and bes
 ### When to Override Rules
 
 Only override ESLint rules when you have a **good reason** and understand the implications. Common valid reasons:
+
 - **Custom defaults**: n8n enforces `limit` default of 50, but your API or use case needs a different value
 - **API-specific constraints**: Your API has different conventions than n8n's standards
 - **Intentional design decisions**: You've made a conscious choice to deviate from the standard
@@ -485,9 +508,9 @@ Create `.eslintrc.js` in the project root:
 
 ```javascript
 module.exports = {
-  rules: {
-    'n8n-nodes-base/node-param-default-wrong-for-limit': 'off',
-  },
+	rules: {
+		'n8n-nodes-base/node-param-default-wrong-for-limit': 'off',
+	},
 };
 ```
 
@@ -495,11 +518,11 @@ module.exports = {
 
 ### Common n8n ESLint Rules
 
-| Rule | Purpose | When to Override |
-|------|---------|-----------------|
-| `node-param-default-wrong-for-limit` | Enforces limit default of 50 | When you need a different default limit (explain why in comments) |
-| `node-param-display-name-wrong-for-dynamic-options` | Requires "Name or ID" suffix for dynamic options | Rarely (this is important for UX) |
-| `node-param-placeholder-miscased-id` | Enforces proper casing for ID placeholders | Very rarely (usually indicates a real issue) |
+| Rule                                                | Purpose                                          | When to Override                                                  |
+| --------------------------------------------------- | ------------------------------------------------ | ----------------------------------------------------------------- |
+| `node-param-default-wrong-for-limit`                | Enforces limit default of 50                     | When you need a different default limit (explain why in comments) |
+| `node-param-display-name-wrong-for-dynamic-options` | Requires "Name or ID" suffix for dynamic options | Rarely (this is important for UX)                                 |
+| `node-param-placeholder-miscased-id`                | Enforces proper casing for ID placeholders       | Very rarely (usually indicates a real issue)                      |
 
 ### Example: Custom Limit Default
 
@@ -524,6 +547,7 @@ In this project, we use a limit default of 10 instead of 50:
 ```
 
 **Files with ESLint overrides:**
+
 - `descriptions/InvoiceLineDescription.ts` - Custom limit default (10 instead of 50)
 - `descriptions/TimesheetDescription.ts` - Custom limit default (10 instead of 50)
 
