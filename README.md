@@ -26,7 +26,6 @@ npm install
 
 # Build before you run
 npm run build
-```
 
 # Start n8n with the custom node loaded (recommended)
 
@@ -35,6 +34,7 @@ npm run dev
 # Alternative: use globally installed n8n
 
 npm run dev:local
+```
 
 ## Operations
 
