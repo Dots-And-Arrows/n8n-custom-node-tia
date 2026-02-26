@@ -44,7 +44,7 @@ npm run dev:local
 | ----------------- | ------------------------------------------------------------------------------------------------ |
 | **Get Many**      | Retrieve all timesheets for a specific month and year                                            |
 | **Get By Period** | Retrieve timesheets between a start and end date                                                 |
-| **Get By User**   | Retrieve timesheets for a specific user by month and year (username loaded dynamically from API) |
+| **Get By User**   | Retrieve timesheets for a specific user by month and year |
 
 All timesheet operations support:
 
@@ -111,7 +111,7 @@ The node uses token-based authentication:
 5. Fill in the required parameters (dates, filters, etc.)
 6. Execute the workflow
 
-> **Note:** The "Get By User" operation provides a dynamic dropdown that loads usernames directly from the TIA API, so you don't have to remember them.
+> **Tip:** For the "Get By User" operation, use the **User > Get Many** operation first to find available usernames.
 
 ### Date Format (Get By Period)
 
@@ -135,6 +135,6 @@ The TIA API expects dates in the format `yyyy-MM-dd HH:mm:ss:ffZ`. The node hand
   - Filter by status (Invoiced, Proforma/Draft, or Any)
   - Client-side limit support
   - Automatic detection and handling of different API response formats
-- Dynamic username dropdown for Get By User (loads from API)
+- Plain text username input for Get By User (use User > Get Many to find usernames)
 - Token-based authentication with automatic caching and refresh
 - Pagination support for large datasets

@@ -234,38 +234,33 @@ if (!returnAll && invoiceLines.length > limit) {
 - We can't control API results, but we can trim them
 - This is only applied when `returnAll` is false
 
-### Dynamic Username Dropdown
+### Username Field (Get By User)
 
-The "Get By User" operation for timesheets uses a dynamic dropdown populated from the API.
+The "Get By User" operation uses a plain text string field for the username.
 
-**Implementation**:
+**Why not a dynamic dropdown?**
 
-1. Define `loadOptionsMethod` in the field definition:
+Previously, this field used `type: 'options'` with `loadOptionsMethod: 'getUsers'` to populate a dropdown from the API. This was removed because:
 
-   ```typescript
-   {
-     displayName: 'Username Name or ID',
-     name: 'username',
-     type: 'options',
-     typeOptions: {
-       loadOptionsMethod: 'getUsers',
-     },
-   }
-   ```
+- **AI Agent compatibility**: When this node is used as a tool by an n8n AI Agent, `loadOptionsMethod` triggers API calls that the agent cannot interact with, causing infinite loops.
+- **`required: true` issues**: Required fields with empty defaults cause immediate validation errors before the AI Agent can fill them in.
 
-2. Implement the method in `methods.loadOptions`:
-   ```typescript
-   methods = {
-   	loadOptions: {
-   		async getUsers(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-   			// Fetch users from API
-   			// Return array of { name, value } objects
-   		},
-   	},
-   };
-   ```
+**Current implementation**:
 
-**n8n Naming Convention**: Fields with `loadOptionsMethod` must end with "Name or ID" (enforced by eslint).
+```typescript
+{
+  displayName: 'Username',
+  name: 'username',
+  type: 'string',  // Plain text input (not a dropdown)
+  default: '',
+  // NOT required: true — removed for AI Agent compatibility
+  description: 'The username to retrieve timesheets for. Use the User > Get Many operation to find available usernames.',
+}
+```
+
+**Runtime validation**: Since `required: true` is not set in the field definition, the username is validated at runtime in `Tia.node.ts` using `NodeOperationError`. This allows the AI Agent to fill in the value before validation occurs.
+
+**Note on AI Agent limitations**: Regular n8n custom nodes cannot be used directly as AI Agent tools. To use this node with an AI Agent, wrap it in a sub-workflow and use the **Workflow Tool** node to expose it to the agent.
 
 ## Testing
 
