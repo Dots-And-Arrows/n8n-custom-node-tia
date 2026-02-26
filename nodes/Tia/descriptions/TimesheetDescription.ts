@@ -138,12 +138,9 @@ export const timesheetFields: INodeProperties[] = [
 
 	// ====== GET BY USER OPERATION FIELDS ======
 	{
-		displayName: 'Username Name or ID',
+		displayName: 'Username',
 		name: 'username',
-		type: 'options',
-		typeOptions: {
-			loadOptionsMethod: 'getUsers',
-		},
+		type: 'string',
 		displayOptions: {
 			show: {
 				resource: ['timesheet'],
@@ -151,9 +148,12 @@ export const timesheetFields: INodeProperties[] = [
 			},
 		},
 		default: '',
-		required: true,
-		description:
-			'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+		// NOT required: true — removed for AI Agent compatibility.
+		// When this node is used as a tool by an n8n AI Agent, required fields with
+		// empty defaults cause immediate validation errors before the agent can fill
+		// them in. Instead, we validate in the execute logic (Tia.node.ts) and throw
+		// a clear error if the username is missing.
+		description: 'The username to retrieve timesheets for. Use the User > Get Many operation to find available usernames.',
 	},
 	{
 		displayName: 'Month',

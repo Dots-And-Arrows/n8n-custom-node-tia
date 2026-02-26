@@ -313,6 +313,15 @@ export class Tia implements INodeType {
 						 * Endpoint: GET /v1/Timesheet/{username}/{month}/{year}
 						 */
 						const username = this.getNodeParameter('username', i) as string;
+
+						// Validate username (not marked as required in description for AI Agent compatibility)
+						if (!username) {
+							throw new NodeOperationError(this.getNode(),
+								'Username is required. Use the User > Get Many operation to find available usernames.',
+								{ itemIndex: i },
+							);
+						}
+
 						const month = this.getNodeParameter('month', i) as number;
 						const year = this.getNodeParameter('year', i) as number;
 						const additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
