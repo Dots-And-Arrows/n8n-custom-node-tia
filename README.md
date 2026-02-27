@@ -45,6 +45,7 @@ npm run dev:local
 | **Get Many**      | Retrieve all timesheets for a specific month and year                                            |
 | **Get By Period** | Retrieve timesheets between a start and end date                                                 |
 | **Get By User**   | Retrieve timesheets for a specific user by month and year |
+| **Get Completion Status** | Get timesheet completion status for all employees in a company |
 
 All timesheet operations support:
 

@@ -358,6 +358,44 @@ export class Tia implements INodeType {
 								pairedItem: { item: i },
 							});
 						}
+					} else if (operation === 'getCompletionStatus') {
+						/**
+						 * GET TIMESHEET COMPLETION STATUS
+						 * Retrieves completion status for all employees in a company
+						 * Endpoint: GET /v1/Timesheet/completionStatus/{companyId}/{month}/{year}
+						 * Returns: Array of { username, fullname, completed }
+						 */
+						const companyId = this.getNodeParameter('companyId', i) as number;
+
+						// Validate companyId (not marked as required in description for AI Agent compatibility)
+						if (!companyId) {
+							throw new NodeOperationError(this.getNode(),
+								'Company ID is required (e.g., 1763737 for Dots and Arrows).',
+								{ itemIndex: i },
+							);
+						}
+
+						const month = this.getNodeParameter('month', i) as number;
+						const year = this.getNodeParameter('year', i) as number;
+
+						const endpoint = `/v1/Timesheet/completionStatus/${companyId}/${month}/${year}`;
+
+						const responseData = await tiaApiRequest.call(this, 'GET', endpoint);
+
+						// Format response data for n8n
+						if (Array.isArray(responseData)) {
+							responseData.forEach((item) => {
+								returnData.push({
+									json: item,
+									pairedItem: { item: i },
+								});
+							});
+						} else {
+							returnData.push({
+								json: responseData,
+								pairedItem: { item: i },
+							});
+						}
 					}
 				} else if (resource === 'user') {
 					if (operation === 'getAll') {

@@ -47,6 +47,12 @@ export const timesheetOperations: INodeProperties[] = [
 				description: 'Get timesheets for a specific user, month, and year',
 				action: 'Get timesheets by user',
 			},
+			{
+				name: 'Get Completion Status',
+				value: 'getCompletionStatus',
+				description: 'Get timesheet completion status for all employees in a company',
+				action: 'Get timesheet completion status',
+			},
 		],
 		default: 'getAll',
 	},
@@ -190,6 +196,58 @@ export const timesheetFields: INodeProperties[] = [
 		},
 		required: true,
 		description: 'The year for which to retrieve timesheets',
+	},
+
+	// ====== GET COMPLETION STATUS OPERATION FIELDS ======
+	{
+		displayName: 'Company ID',
+		name: 'companyId',
+		type: 'number',
+		default: 1763737,
+		displayOptions: {
+			show: {
+				resource: ['timesheet'],
+				operation: ['getCompletionStatus'],
+			},
+		},
+		// NOT required: true — removed for AI Agent compatibility.
+		description: 'The company ID to check completion status for (e.g., 1763737 for Dots and Arrows)',
+	},
+	{
+		displayName: 'Month',
+		name: 'month',
+		type: 'number',
+		default: currentMonth,
+		typeOptions: {
+			minValue: 1,
+			maxValue: 12,
+		},
+		displayOptions: {
+			show: {
+				resource: ['timesheet'],
+				operation: ['getCompletionStatus'],
+			},
+		},
+		required: true,
+		description: 'The month for which to check completion status (1-12)',
+	},
+	{
+		displayName: 'Year',
+		name: 'year',
+		type: 'number',
+		default: currentYear,
+		typeOptions: {
+			minValue: 2000,
+			maxValue: 2100,
+		},
+		displayOptions: {
+			show: {
+				resource: ['timesheet'],
+				operation: ['getCompletionStatus'],
+			},
+		},
+		required: true,
+		description: 'The year for which to check completion status',
 	},
 
 	// ====== ADDITIONAL FIELDS (SHARED ACROSS ALL OPERATIONS) ======
