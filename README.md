@@ -40,11 +40,11 @@ npm run dev:local
 
 ### Timesheet
 
-| Operation         | Description                                                                                      |
-| ----------------- | ------------------------------------------------------------------------------------------------ |
-| **Get Many**      | Retrieve all timesheets for a specific month and year                                            |
-| **Get By Period** | Retrieve timesheets between a start and end date                                                 |
-| **Get By User**   | Retrieve timesheets for a specific user by month and year |
+| Operation                 | Description                                                    |
+| ------------------------- | -------------------------------------------------------------- |
+| **Get Many**              | Retrieve all timesheets for a specific month and year          |
+| **Get By Period**         | Retrieve timesheets between a start and end date               |
+| **Get By User**           | Retrieve timesheets for a specific user by month and year      |
 | **Get Completion Status** | Get timesheet completion status for all employees in a company |
 
 All timesheet operations support:
@@ -126,16 +126,33 @@ The TIA API expects dates in the format `yyyy-MM-dd HH:mm:ss:ffZ`. The node hand
 
 ## Version history
 
-### 0.1.0
+### 0.4.0
 
-- Initial release
-- **Timesheet resource** with Get Many, Get By Period, and Get By User operations
-- **User resource** with Get Many operation
+- **Timesheet Completion Status** operation for checking which employees have completed their timesheets
+- Changed username field from dynamic dropdown to plain text input for AI Agent compatibility
+- Updated README and DEVELOPER.md to reflect dropdown removal
+
+### 0.3.0
+
 - **Invoice Line resource** with Search operation
   - Filter by creation date (Created After)
   - Filter by status (Invoiced, Proforma/Draft, or Any)
   - Client-side limit support
   - Automatic detection and handling of different API response formats
-- Plain text username input for Get By User (use User > Get Many to find usernames)
+- Changed default limit from 50 to 10 across all resources
+- Added 404 and 429 error handling
+- Added DEVELOPER.md with comprehensive developer guide
+
+### 0.2.0
+
+- **User resource** with Get Many operation
+- Dynamic username dropdown for Get By User (loads usernames from API)
+- Added Dots & Arrows logo
+
+### 0.1.0
+
+- Initial release
+- **Timesheet resource** with Get Many, Get By Period, and Get By User operations
 - Token-based authentication with automatic caching and refresh
 - Pagination support for large datasets
+- Date format conversion for Get By Period
