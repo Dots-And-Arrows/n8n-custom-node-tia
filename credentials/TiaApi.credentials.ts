@@ -31,7 +31,7 @@ export class TiaApi implements ICredentialType {
 			type: 'string',
 			default: 'https://api.staging.tia.cronos.be',
 			required: true,
-			//Change to production URL when deploying: https://api.tia.cronos.be
+			// Production URL: https://api.live.tia.cronos.be
 		},
 		{
 			displayName: 'API Key',
