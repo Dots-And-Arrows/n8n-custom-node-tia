@@ -62,7 +62,7 @@ export class Tia implements INodeType {
 		group: ['transform'], // Node category in n8n
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}', // Dynamic subtitle
-		description: 'Interact with TIA API for timesheets and invoices',
+		description: 'Retrieve timesheet data, user info, and invoice lines from the TIA API. Use this tool to get timesheets by month, by period, or by user, check timesheet completion status per employee, look up users, or search invoice lines by date and status.',
 		defaults: {
 			name: 'TIA',
 		},
