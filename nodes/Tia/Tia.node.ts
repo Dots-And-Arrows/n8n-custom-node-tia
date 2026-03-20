@@ -255,17 +255,22 @@ export class Tia implements INodeType {
 					} else if (operation === 'getByPeriod') {
 						/**
 						 * GET TIMESHEETS BY PERIOD
-						 * Retrieves timesheets between two dates
-						 * Endpoint: GET /v1/Timesheet/period/{startDate}/{endDate}
+						 * Retrieves timesheets for a specific user between two dates
+						 * Endpoint: GET /v1/Timesheet/period/{username}/{startDate}/{endDate}
 						 *
 						 * NOTE: TIA API requires specific date format:
 						 * - Format: yyyy-MM-dd HH:mm:ss:ffZ
 						 * - Example: 2025-01-20 00:00:00:00Z
 						 * - Alternative: yyyyMMdd (20250120)
 						 */
+						const username = this.getNodeParameter('username', i) as string;
 						const startDate = this.getNodeParameter('startDate', i) as string;
 						const endDate = this.getNodeParameter('endDate', i) as string;
 						const additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
+
+						if (!username) {
+							throw new NodeOperationError(this.getNode(), 'Username is required for Get By Period', { itemIndex: i });
+						}
 
 						// Convert n8n date format to TIA API format
 						// n8n provides: 2025-01-01T00:00:00 (ISO 8601)
@@ -273,8 +278,8 @@ export class Tia implements INodeType {
 						const formattedStartDate = startDate.split('T')[0] + ' 00:00:00:00Z';
 						const formattedEndDate = endDate.split('T')[0] + ' 23:59:59:99Z';
 
-						// Build API endpoint with formatted dates
-						const endpoint = `/v1/Timesheet/period/${formattedStartDate}/${formattedEndDate}`;
+						// Build API endpoint with username and formatted dates
+						const endpoint = `/v1/Timesheet/period/${username}/${formattedStartDate}/${formattedEndDate}`;
 
 						let responseData: IDataObject | IDataObject[];
 

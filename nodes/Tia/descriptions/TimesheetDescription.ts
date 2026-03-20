@@ -114,6 +114,21 @@ export const timesheetFields: INodeProperties[] = [
 
 	// ====== GET BY PERIOD OPERATION FIELDS ======
 	{
+		displayName: 'Username',
+		name: 'username',
+		type: 'string',
+		displayOptions: {
+			show: {
+				resource: ['timesheet'],
+				operation: ['getByPeriod'],
+			},
+		},
+		default: '',
+		// NOT required: true — removed for AI Agent compatibility.
+		// Validated at runtime in Tia.node.ts.
+		description: 'The username to retrieve timesheets for. Use the User > Get Many operation to find available usernames.',
+	},
+	{
 		displayName: 'Start Date',
 		name: 'startDate',
 		type: 'dateTime',
