@@ -269,14 +269,17 @@ export class Tia implements INodeType {
 						const additionalFields = this.getNodeParameter('additionalFields', i) as IDataObject;
 
 						if (!username) {
-							throw new NodeOperationError(this.getNode(), 'Username is required for Get By Period', { itemIndex: i });
+							throw new NodeOperationError(
+								this.getNode(),
+								'Username is required for Get By Period',
+								{ itemIndex: i },
+							);
 						}
 
-						// Convert n8n date format to TIA API format
-						// n8n provides: 2025-01-01T00:00:00 (ISO 8601)
-						// TIA expects: 2025-01-01 00:00:00:00Z
-						const formattedStartDate = startDate.split('T')[0] + ' 00:00:00:00Z';
-						const formattedEndDate = endDate.split('T')[0] + ' 23:59:59:99Z';
+						// Convert to yyyyMMdd format (accepted by TIA API)
+						// Handles both ISO input (2026-03-18T00:00:00) and plain dates (20260318 or 2026-03-18)
+						const formattedStartDate = startDate.split('T')[0].replace(/-/g, '');
+						const formattedEndDate = endDate.split('T')[0].replace(/-/g, '');
 
 						// Build API endpoint with username and formatted dates
 						const endpoint = `/v1/Timesheet/period/${username}/${formattedStartDate}/${formattedEndDate}`;
@@ -321,7 +324,8 @@ export class Tia implements INodeType {
 
 						// Validate username (not marked as required in description for AI Agent compatibility)
 						if (!username) {
-							throw new NodeOperationError(this.getNode(),
+							throw new NodeOperationError(
+								this.getNode(),
 								'Username is required. Use the User > Get Many operation to find available usernames.',
 								{ itemIndex: i },
 							);
@@ -374,7 +378,8 @@ export class Tia implements INodeType {
 
 						// Validate companyId (not marked as required in description for AI Agent compatibility)
 						if (!companyId) {
-							throw new NodeOperationError(this.getNode(),
+							throw new NodeOperationError(
+								this.getNode(),
 								'Company ID is required (e.g., 1763737 for Dots and Arrows).',
 								{ itemIndex: i },
 							);
