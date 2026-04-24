@@ -378,11 +378,9 @@ export class Tia implements INodeType {
 
 						// Validate companyId (not marked as required in description for AI Agent compatibility)
 						if (!companyId) {
-							throw new NodeOperationError(
-								this.getNode(),
-								'Company ID is required (e.g., 1763737 for Dots and Arrows).',
-								{ itemIndex: i },
-							);
+							throw new NodeOperationError(this.getNode(), 'Company ID is required.', {
+								itemIndex: i,
+							});
 						}
 
 						const month = this.getNodeParameter('month', i) as number;

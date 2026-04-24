@@ -218,7 +218,8 @@ export const timesheetFields: INodeProperties[] = [
 		displayName: 'Company ID',
 		name: 'companyId',
 		type: 'number',
-		default: 1763737,
+		default: '',
+		placeholder: 'e.g. 1234567',
 		displayOptions: {
 			show: {
 				resource: ['timesheet'],
@@ -226,7 +227,7 @@ export const timesheetFields: INodeProperties[] = [
 			},
 		},
 		// NOT required: true — removed for AI Agent compatibility.
-		description: 'The company ID to check completion status for (e.g., 1763737 for Dots and Arrows)',
+		description: 'The company ID to check completion status for. You can find this in your TIA account.',
 	},
 	{
 		displayName: 'Month',
