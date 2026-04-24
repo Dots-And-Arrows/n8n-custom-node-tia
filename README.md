@@ -85,7 +85,7 @@ To use this node you need the following credentials from your TIA administrator:
 
 | Field        | Description                                                         |
 | ------------ | ------------------------------------------------------------------- |
-| **Base URL** | The TIA API endpoint (default: `https://api.staging.tia.cronos.be`) |
+| **Base URL** | The TIA API endpoint (e.g. `https://api.live.tia.cronos.be`) |
 | **API Key**  | Your TIA API key (used in the `X-apikey` header)                    |
 | **Username** | Your TIA username                                                   |
 | **Password** | Your TIA password                                                   |
