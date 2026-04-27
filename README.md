@@ -83,12 +83,12 @@ All timesheet operations support:
 
 To use this node you need the following credentials from your TIA administrator:
 
-| Field        | Description                                                         |
-| ------------ | ------------------------------------------------------------------- |
-| **Base URL** | The TIA API endpoint (e.g. `https://api.live.tia.cronos.be`) |
-| **API Key**  | Your TIA API key (used in the `X-apikey` header)                    |
-| **Username** | Your TIA username                                                   |
-| **Password** | Your TIA password                                                   |
+| Field        | Description                                      |
+| ------------ | ------------------------------------------------ |
+| **Base URL** | The TIA API endpoint                             |
+| **API Key**  | Your TIA API key (used in the `X-apikey` header) |
+| **Username** | Your TIA username                                |
+| **Password** | Your TIA password                                |
 
 The node uses token-based authentication:
 
