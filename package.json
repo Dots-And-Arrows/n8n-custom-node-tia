@@ -13,7 +13,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Dots-And-Arrows/n8n-custom-node-tia"
+		"url": "git+https://github.com/Dots-And-Arrows/n8n-custom-node-tia.git"
 	},
 	"scripts": {
 		"build": "n8n-node build",
