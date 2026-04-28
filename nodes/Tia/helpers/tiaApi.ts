@@ -165,14 +165,13 @@ export async function getTiaToken(
  */
 export async function tiaApiRequest(
 	this: IExecuteFunctions,
+	credentials: TiaCredentials,
 	method: IHttpRequestMethods,
 	endpoint: string,
 	body?: IDataObject,
 	qs?: IDataObject,
 ): Promise<IDataObject | IDataObject[]> {
-	// Get credentials configured in n8n
-	const credentials = await this.getCredentials('tiaApi');
-	const { baseUrl, apiKey, username } = credentials as unknown as TiaCredentials;
+	const { baseUrl, apiKey, username } = credentials;
 
 	// Get authentication token (uses cache if available)
 	const token = await getTiaToken.call(this, credentials as unknown as TiaCredentials);
@@ -294,6 +293,7 @@ export async function tiaApiRequest(
  */
 export async function tiaApiRequestAllItems(
 	this: IExecuteFunctions,
+	credentials: TiaCredentials,
 	method: IHttpRequestMethods,
 	endpoint: string,
 	body?: IDataObject,
@@ -310,7 +310,7 @@ export async function tiaApiRequestAllItems(
 
 	// Keep fetching pages until we get all data
 	while (hasMore) {
-		response = await tiaApiRequest.call(this, method, endpoint, body, queryString);
+		response = await tiaApiRequest.call(this, credentials, method, endpoint, body, queryString);
 
 		// Handle direct array response format
 		if (Array.isArray(response)) {

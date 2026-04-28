@@ -20,9 +20,7 @@
 
 import type {
 	IExecuteFunctions,
-	ILoadOptionsFunctions,
 	INodeExecutionData,
-	INodePropertyOptions,
 	INodeType,
 	INodeTypeDescription,
 	IDataObject,
@@ -37,7 +35,7 @@ import {
 	invoiceLineOperations,
 	invoiceLinesFields,
 } from './descriptions';
-import { tiaApiRequest, tiaApiRequestAllItems } from './helpers/tiaApi';
+import { tiaApiRequest, tiaApiRequestAllItems, type TiaCredentials } from './helpers/tiaApi';
 
 /**
  * TIA Node Implementation
@@ -120,61 +118,6 @@ export class Tia implements INodeType {
 	};
 
 	/**
-	 * Methods for dynamic option loading
-	 *
-	 * These methods are called by n8n when a field uses loadOptionsMethod.
-	 * They fetch data from the API to populate dropdowns dynamically.
-	 */
-	methods = {
-		loadOptions: {
-			// Fetches all users from TIA API and returns them as dropdown options
-			async getUsers(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-				const credentials = await this.getCredentials('tiaApi');
-				const baseUrl = credentials.baseUrl as string;
-				const apiKey = credentials.apiKey as string;
-
-				// Get a token first
-				const tokenResponse = await this.helpers.httpRequest({
-					method: 'POST',
-					url: `${baseUrl}/v1/Token`,
-					headers: {
-						'Content-Type': 'application/json',
-						Accept: 'application/json',
-						'X-apikey': apiKey,
-					},
-					body: {
-						username: credentials.username,
-						password: credentials.password,
-					},
-					json: true,
-				});
-
-				// Fetch users with the token
-				const users = await this.helpers.httpRequest({
-					method: 'GET',
-					url: `${baseUrl}/v1/User`,
-					headers: {
-						'Content-Type': 'application/json',
-						'X-apikey': apiKey,
-						Authorization: `Access_token ${tokenResponse.token}`,
-					},
-					json: true,
-				});
-
-				// Map users to dropdown options
-				if (Array.isArray(users)) {
-					return users.map((user: IDataObject) => ({
-						name: (user.username as string) || (user.userName as string) || String(user.id),
-						value: (user.username as string) || (user.userName as string) || String(user.id),
-					}));
-				}
-
-				return [];
-			},
-		},
-	};
-
-	/**
 	 * Execute Function
 	 *
 	 * This is called when the workflow runs and reaches this node.
@@ -195,6 +138,9 @@ export class Tia implements INodeType {
 		// Get data passed from previous nodes
 		const items = this.getInputData();
 		const returnData: INodeExecutionData[] = [];
+
+		// Get credentials once for all API calls in this execution
+		const credentials = await this.getCredentials('tiaApi') as unknown as TiaCredentials;
 
 		// Get user-selected resource and operation
 		const resource = this.getNodeParameter('resource', 0);
@@ -224,10 +170,10 @@ export class Tia implements INodeType {
 						// Check if user wants all results or limited results
 						if (additionalFields.returnAll === true) {
 							// Fetch all pages using pagination
-							responseData = await tiaApiRequestAllItems.call(this, 'GET', endpoint);
+							responseData = await tiaApiRequestAllItems.call(this, credentials, 'GET', endpoint);
 						} else {
 							// Fetch single page
-							responseData = await tiaApiRequest.call(this, 'GET', endpoint);
+							responseData = await tiaApiRequest.call(this, credentials, 'GET', endpoint);
 
 							// Apply limit if specified (default 10)
 							if (additionalFields.limit && Array.isArray(responseData)) {
@@ -289,10 +235,10 @@ export class Tia implements INodeType {
 						// Check if user wants all results or limited results
 						if (additionalFields.returnAll === true) {
 							// Fetch all pages using pagination
-							responseData = await tiaApiRequestAllItems.call(this, 'GET', endpoint);
+							responseData = await tiaApiRequestAllItems.call(this, credentials, 'GET', endpoint);
 						} else {
 							// Fetch single page
-							responseData = await tiaApiRequest.call(this, 'GET', endpoint);
+							responseData = await tiaApiRequest.call(this, credentials, 'GET', endpoint);
 
 							// Apply limit if specified (default 10)
 							if (additionalFields.limit && Array.isArray(responseData)) {
@@ -342,10 +288,10 @@ export class Tia implements INodeType {
 						// Check if user wants all results or limited results
 						if (additionalFields.returnAll === true) {
 							// Fetch all pages using pagination
-							responseData = await tiaApiRequestAllItems.call(this, 'GET', endpoint);
+							responseData = await tiaApiRequestAllItems.call(this, credentials, 'GET', endpoint);
 						} else {
 							// Fetch single page
-							responseData = await tiaApiRequest.call(this, 'GET', endpoint);
+							responseData = await tiaApiRequest.call(this, credentials, 'GET', endpoint);
 
 							// Apply limit if specified (default 10)
 							if (additionalFields.limit && Array.isArray(responseData)) {
@@ -388,7 +334,7 @@ export class Tia implements INodeType {
 
 						const endpoint = `/v1/Timesheet/completionStatus/${companyId}/${month}/${year}`;
 
-						const responseData = await tiaApiRequest.call(this, 'GET', endpoint);
+						const responseData = await tiaApiRequest.call(this, credentials, 'GET', endpoint);
 
 						// Format response data for n8n
 						if (Array.isArray(responseData)) {
@@ -409,7 +355,7 @@ export class Tia implements INodeType {
 					if (operation === 'getAll') {
 						const endpoint = '/v1/User';
 
-						const responseData = await tiaApiRequest.call(this, 'GET', endpoint);
+						const responseData = await tiaApiRequest.call(this, credentials, 'GET', endpoint);
 
 						if (Array.isArray(responseData)) {
 							responseData.forEach((item) => {
@@ -461,10 +407,10 @@ export class Tia implements INodeType {
 						// Check if user wants all results or limited results
 						if (returnAll) {
 							// Fetch all pages using pagination
-							responseData = await tiaApiRequestAllItems.call(this, 'GET', endpoint, undefined, qs);
+							responseData = await tiaApiRequestAllItems.call(this, credentials, 'GET', endpoint, undefined, qs);
 						} else {
 							// Fetch first page from API (API doesn't support limit parameter)
-							responseData = await tiaApiRequest.call(this, 'GET', endpoint, undefined, qs);
+							responseData = await tiaApiRequest.call(this, credentials, 'GET', endpoint, undefined, qs);
 						}
 
 						// Extract invoiceLines array from response
