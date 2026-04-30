@@ -126,6 +126,12 @@ The TIA API expects dates in the format `yyyy-MM-dd HH:mm:ss:ffZ`. The node hand
 
 ## Version history
 
+### 0.4.4 (Apr 30, 2026)
+
+- Removed dead `requestDefaults` block from node description (n8n verification requirement)
+- Removed unused `loadOptions.getUsers` method (dead code since user dropdown removal)
+- Moved `getCredentials()` call to `execute()` and pass credentials as parameter to API helpers (n8n linter compliance)
+
 ### 0.4.0
 
 - **Timesheet Completion Status** operation for checking which employees have completed their timesheets
